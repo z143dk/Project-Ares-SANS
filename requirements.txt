@@ -1,0 +1,8 @@
+mcp-server
+fastapi
+uvicorn
+pydantic
+httpx
+flask
+flask-cors
+paramiko

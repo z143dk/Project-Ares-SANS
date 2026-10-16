@@ -1,0 +1,31 @@
+version: "1.2"
+metadata:
+  name: "project-talos-hardened-egress"
+  description: "Egress control to block TeamPCP C2 and credential exfiltration."
+
+rules:
+  # 1. Block known C2 domains for the Mini Shai-Hulud campaign
+  - id: "block-teampcp-c2"
+    action: DENY
+    destination: "teampcp.io"
+    log: true
+
+  # 2. Prevent unauthorized GitHub repository creation (Exfil method)
+  - id: "prevent-gh-dead-drop"
+    action: DENY
+    protocol: HTTPS
+    destination: "api.github.com"
+    path: "/user/repos"
+    method: "POST"
+    alert: "High: Attempt to create new repository detected. Potential exfiltration."
+
+  # 3. Restrict 'Bun' binary downloads (used by the 2026 worm)
+  - id: "block-unauthorized-runtimes"
+    action: DENY
+    destination: "bun.sh"
+    on_violation: "isolate_container"
+
+  # 4. Allow only necessary coding APIs (White-list)
+  - id: "allow-gemini-api"
+    action: ALLOW
+    destination: "*.googleapis.com"

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARES // Project Aergia</title>
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --bg-card: rgba(20, 20, 20, 0.8);
+            --ares-crimson: #dc143c;
+            --ares-glow: rgba(220, 20, 60, 0.3);
+            --text-main: #e0e0e0;
+            --text-dim: #888;
+            --border-steel: #2f3e46;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 240px 1fr 320px;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar Navigation --- */
+        nav {
+            background: rgba(10, 10, 10, 0.95);
+            border-right: 1px solid var(--border-steel);
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 4px;
+            color: var(--ares-crimson);
+            font-size: 1.5rem;
+            text-align: center;
+            border-bottom: 2px solid var(--ares-crimson);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .nav-item {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 0.5rem;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--ares-crimson);
+            background: rgba(220, 20, 60, 0.1);
+            border-left: 3px solid var(--ares-crimson);
+        }
+
+        /* --- Main Command Center --- */
+        main {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 0.2rem 0.8rem;
+            border: 1px solid var(--ares-crimson);
+            color: var(--ares-crimson);
+            text-transform: uppercase;
+            box-shadow: 0 0 10px var(--ares-glow);
+        }
+
+        /* --- Agent Autonomy Controls --- */
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-steel);
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .card h3 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-steel);
+            padding-bottom: 0.5rem;
+        }
+
+        .autonomy-dial {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--ares-crimson);
+            cursor: pointer;
+        }
+
+        /* --- Thought Stream / Feed --- */
+        .thought-stream {
+            flex-grow: 1;
+            background: #000;
+            border: 1px solid var(--border-steel);
+            padding: 1rem;
+            font-size: 0.85rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .log-entry { display: flex; gap: 1rem; }
+        .timestamp { color: var(--text-dim); min-width: 80px; }
+        .action { color: var(--ares-crimson); font-weight: bold; }
+        .reasoning { color: var(--text-main); font-style: italic; opacity: 0.8; }
+
+        /* --- Right Sidebar Metrics --- */
+        aside {
+            background: rgba(10, 10, 10, 0.95);
+            border-left: 1px solid var(--border-steel);
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .metric {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .metric-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; }
+        .metric-value { font-size: 1.5rem; font-weight: bold; color: var(--ares-crimson); }
+
+        .shield-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+            border: 2px solid var(--ares-crimson);
+            border-radius: 50% 50% 10% 10%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px var(--ares-glow);
+        }
+
+        /* Scanline Overlay for 2026 Surveillance Aesthetic */
+        body::before {
+            content: " ";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">ARES</div>
+        <a class="nav-item active">COMMAND_CENTER</a>
+        <a class="nav-item">AGENT_HIERARCHY</a>
+        <a class="nav-item">SECURITY_LOGS</a>
+        <a class="nav-item">THREAT_MAP</a>
+        <a class="nav-item">CONFIG_OS</a>
+    </nav>
+
+    <main>
+        <header>
+            <div>
+                <h1 style="font-size: 2rem;">AERGIA // ARES_MODULE</h1>
+                <p style="color: var(--text-dim);">Tactical Agent Deployment Environment</p>
+            </div>
+            <div class="status-badge">System: Armed</div>
+        </header>
+
+        <div class="control-grid">
+            <div class="card">
+                <h3>Autonomy Protocol</h3>
+                <div class="autonomy-dial">
+                    <span id="autonomy-label">Assist Mode</span>
+                </div>
+                <input type="range" min="1" max="3" value="2" id="autonomy-slider">
+            </div>
+            <div class="card">
+                <h3>Active Mission</h3>
+                <p style="color: var(--ares-crimson);">OP: SHAI-HULUD_SENTRY</p>
+                <p style="font-size: 0.8rem; margin-top: 0.5rem;">Target: Supply Chain Guardrail</p>
+            </div>
+            <div class="card" style="border-color: var(--ares-crimson);">
+                <h3 style="color: var(--ares-crimson); border-bottom-color: var(--ares-crimson);">VM Control Center</h3>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                        <span>SIFT Workstation:</span>
+                        <span id="vm-status" style="color: var(--text-dim);">Checking...</span>
+                    </div>
+                    <button onclick="bootVM()" style="background: rgba(220,20,60,0.2); border: 1px solid var(--ares-crimson); color: white; padding: 0.5rem; cursor: pointer; font-family: inherit;">[1] Boot SIFT VM</button>
+                    <button onclick="installProtocolSIFT()" style="background: rgba(220,20,60,0.2); border: 1px solid var(--ares-crimson); color: white; padding: 0.5rem; cursor: pointer; font-family: inherit;">[2] Install Protocol SIFT</button>
+                </div>
+            </div>
+            <div class="card" style="border-color: #0f0;">
+                <h3 style="color: #0f0; border-bottom-color: #0f0;">USB Triage Center</h3>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                        <span>Triage Drive (D:):</span>
+                        <span id="triage-status" style="color: #0f0;">Ready</span>
+                    </div>
+                    <button onclick="analyzeTriage()" style="background: rgba(0,255,0,0.1); border: 1px solid #0f0; color: white; padding: 0.5rem; cursor: pointer; font-family: inherit;">[3] Run DFIR Sweep</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="flex-grow: 1; display: flex; flex-direction: column;">
+            <h3>Thought Process Stream</h3>
+            <div class="thought-stream" id="stream">
+                </div>
+        </div>
+    </main>
+
+    <aside>
+        <div class="shield-icon">Λ</div>
+        <div class="metric">
+            <span class="metric-label">System Risk Level</span>
+            <span class="metric-value">0.02%</span>
+        </div>
+        <div class="metric">
+            <span class="metric-label">Agent Confidence</span>
+            <span class="metric-value">98.4%</span>
+        </div>
+        <div class="metric">
+            <span class="metric-label">Exfiltration Attempts Blocked</span>
+            <span class="metric-value">1,422</span>
+        </div>
+        <div class="metric" style="margin-top: auto;">
+            <button style="background: var(--ares-crimson); color: white; border: none; padding: 1rem; cursor: pointer; font-family: inherit; font-weight: bold;">SCRAM / EMERGENCY_LOCKDOWN</button>
+        </div>
+    </aside>
+
+    <script>
+        const stream = document.getElementById('stream');
+        const slider = document.getElementById('autonomy-slider');
+        const label = document.getElementById('autonomy-label');
+        const vmStatusEl = document.getElementById('vm-status');
+
+        const modes = ["Watch Mode", "Assist Mode", "Autonomous"];
+        slider.oninput = function() {
+            label.innerText = modes[this.value - 1];
+            addLog("PROTOCOL_CHANGE", `System shifted to ${modes[this.value - 1]}`);
+        };
+
+        function addLog(action, reasoning) {
+            const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `
+                <span class="timestamp">[${time}]</span>
+                <span class="action">${action}</span>
+                <span class="reasoning">${reasoning}</span>
+            `;
+            stream.prepend(entry);
+        }
+
+        // --- VM Control API Calls ---
+        async function checkVMStatus() {
+            try {
+                const res = await fetch('/api/vm/status');
+                const data = await res.json();
+                if(data.status === 'success') {
+                    vmStatusEl.innerText = data.state.toUpperCase();
+                    vmStatusEl.style.color = data.state === 'running' ? '#0f0' : 'var(--text-dim)';
+                } else {
+                    vmStatusEl.innerText = 'ERROR';
+                }
+            } catch(e) {
+                vmStatusEl.innerText = 'DISCONNECTED';
+            }
+        }
+
+        async function bootVM() {
+            addLog("VM_CONTROL", "Initiating SIFT Workstation Boot Sequence...");
+            try {
+                const res = await fetch('/api/vm/start', { method: 'POST' });
+                const data = await res.json();
+                addLog("VM_STATUS", data.message);
+                setTimeout(checkVMStatus, 3000);
+            } catch(e) {
+                addLog("ERROR", "Failed to connect to Ares API backend.");
+            }
+        }
+
+        async function installProtocolSIFT() {
+            addLog("SSH_EXEC", "Connecting to SIFT VM to install Protocol SIFT. Please wait...");
+            try {
+                const res = await fetch('/api/vm/install', { method: 'POST' });
+                const data = await res.json();
+                addLog(data.status === 'success' ? "INSTALL_SUCCESS" : "INSTALL_ERROR", data.message);
+                if(data.logs) {
+                    addLog("SYS_OUTPUT", "Terminal Output Recorded.");
+                }
+            } catch(e) {
+                addLog("ERROR", "Connection to backend failed.");
+            }
+        }
+
+        async function analyzeTriage() {
+            addLog("DFIR_SWEEP", "Initiating forensic sweep across D: triage report logs...");
+            try {
+                const res = await fetch('/api/triage/analyze');
+                const data = await res.json();
+                if(data.status === 'success') {
+                    addLog("DFIR_SWEEP", `Success! Monitored ${data.total_connections} sockets.`);
+                    addLog("DFIR_SWEEP", `Resolved ${data.false_positives_count} False Positives (Tailscale/Surfshark).`);
+                    addLog("DFIR_SWEEP", `Flagged ${data.anomalies_count} anomalies running from Temp/AppData.`);
+                    
+                    data.false_positives.forEach(c => {
+                        addLog("FALSE_POSITIVE", `PID ${c.pid} (${c.proc_name}) -> Verified safe.`);
+                    });
+                    data.anomalies.forEach(c => {
+                        addLog("ALERT", `PID ${c.pid} (${c.proc_name}) -> Active connection from user space: ${c.proc_path}`);
+                    });
+                } else {
+                    addLog("ERROR", data.message);
+                }
+            } catch(e) {
+                addLog("ERROR", "Failed to contact API server.");
+            }
+        }
+
+        // Initial setup
+        checkVMStatus();
+        setInterval(checkVMStatus, 10000); // Check status every 10s
+        addLog("SYSTEM", "ARES Module Initialized. Waiting for command.");
+    </script>
+</body>
+</html>
