@@ -1,4 +1,4 @@
-mcp-server
+mcp<2
 fastapi
 uvicorn
 pydantic
@@ -6,3 +6,4 @@ httpx
 flask
 flask-cors
 paramiko
+pyyaml
